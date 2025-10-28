@@ -1,0 +1,2910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Feedback - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+  /* Primitive Color Tokens */
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+
+  /* RGB versions for opacity control */
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+
+  /* Background color tokens (Light Mode) */
+  --color-bg-1: rgba(59, 130, 246, 0.08);
+  --color-bg-2: rgba(245, 158, 11, 0.08);
+  --color-bg-3: rgba(34, 197, 94, 0.08);
+  --color-bg-4: rgba(239, 68, 68, 0.08);
+  --color-bg-5: rgba(147, 51, 234, 0.08);
+  --color-bg-6: rgba(249, 115, 22, 0.08);
+  --color-bg-7: rgba(236, 72, 153, 0.08);
+  --color-bg-8: rgba(6, 182, 212, 0.08);
+
+  /* Semantic Color Tokens (Light Mode) */
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-primary-active: var(--color-teal-700);
+  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-teal-500);
+  --color-warning: var(--color-orange-500);
+  --color-info: var(--color-slate-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
+
+  /* Common style patterns */
+  --focus-ring: 0 0 0 3px var(--color-focus-ring);
+  --focus-outline: 2px solid var(--color-primary);
+  --status-bg-opacity: 0.15;
+  --status-border-opacity: 0.25;
+
+  /* RGB versions for opacity control */
+  --color-success-rgb: 33, 128, 141;
+  --color-error-rgb: 192, 21, 47;
+  --color-warning-rgb: 168, 75, 47;
+  --color-info-rgb: 98, 108, 113;
+
+  /* Typography */
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 30px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.01em;
+
+  /* Spacing */
+  --space-0: 0;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04),
+    0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+}
+
+@font-face {
+  font-family: 'FKGroteskNeue';
+  src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2')
+    format('woff2');
+}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar Styles */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--color-white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: var(--space-16) var(--space-32);
+        }
+
+        .nav-container {
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #1a1a2e;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-32);
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            transition: color var(--duration-fast) var(--ease-standard);
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--color-primary);
+        }
+
+        .nav-button {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-8) var(--space-20);
+            border-radius: var(--radius-base);
+            border: none;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-standard);
+        }
+
+        .nav-button:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: var(--space-32);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Home Page */
+        .hero-section {
+            text-align: center;
+            padding: var(--space-32) 0;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: var(--space-16);
+            background: linear-gradient(135deg, #3b82f6, #06b6d4, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-subtitle {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #06b6d4;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+
+        .hero-appreciation {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto var(--space-32) auto;
+            line-height: 1.8;
+            text-align: center;
+            padding: 0 var(--space-16);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .hero-appreciation {
+                color: var(--color-gray-300);
+            }
+        }
+
+        [data-color-scheme="dark"] .hero-appreciation {
+            color: var(--color-gray-300);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-24);
+            margin: var(--space-32) 0;
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            text-align: center;
+            transition: transform var(--duration-fast) var(--ease-standard);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        /* Feedback Form */
+        .form-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-32);
+            margin: var(--space-32) 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-24);
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-family: var(--font-family-base);
+            background: var(--color-white);
+            color: var(--color-text);
+            transition: border-color var(--duration-fast) var(--ease-standard);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: var(--focus-ring);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-12) var(--space-32);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-standard);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* Dashboard */
+        .dashboard-section {
+            margin-top: var(--space-32);
+        }
+
+        .dashboard-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-24);
+            color: var(--color-text);
+        }
+
+        .chart-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+            height: 400px;
+        }
+
+        /* About & Contact Pages */
+        .content-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-32);
+            margin: var(--space-24) 0;
+        }
+
+        .section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+
+        .section-text {
+            font-size: var(--font-size-base);
+            line-height: 1.8;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-16);
+        }
+
+        /* Login Page */
+        .login-page-wrapper {
+            background: #f5f5f5;
+            min-height: calc(100vh - 200px);
+            padding: var(--space-32) var(--space-16);
+        }
+
+        .back-to-home {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-8) var(--space-20);
+            border-radius: var(--radius-base);
+            border: none;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-standard);
+            margin-bottom: var(--space-24);
+            display: inline-block;
+        }
+
+        .back-to-home:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .login-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .admin-portal-header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .admin-portal-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-12);
+        }
+
+        .admin-portal-title {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .login-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: var(--space-16) var(--space-24);
+            background: #e5e7eb;
+            border: none;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--duration-fast);
+            border-bottom: 2px solid transparent;
+        }
+
+        .login-tab.active {
+            background: white;
+            color: var(--color-text);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .login-tab:hover:not(.active) {
+            background: #d1d5db;
+        }
+
+        .login-form-container {
+            padding: var(--space-32);
+        }
+
+        .login-form-content {
+            display: none;
+        }
+
+        .login-form-content.active {
+            display: block;
+        }
+
+        .login-form-heading {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-24);
+            color: var(--color-text);
+            text-align: center;
+        }
+
+        .login-form .form-control {
+            background: white;
+            background-image: none;
+            border: 1px solid #d1d5db;
+        }
+
+        /* Remove any icon shadows or watermarks from admin email field */
+        #admin-email {
+            background: white !important;
+            background-image: none !important;
+            background-color: white !important;
+        }
+
+        #admin-email::before,
+        #admin-email::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        .btn-blue {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-12) var(--space-24);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            width: 100%;
+            transition: background var(--duration-fast);
+        }
+
+        .btn-blue:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .login-container {
+            max-width: 450px;
+            margin: var(--space-32) auto;
+        }
+
+        .login-form {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-32);
+        }
+
+        .login-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            text-align: center;
+            margin-bottom: var(--space-24);
+            color: var(--color-text);
+        }
+
+        /* Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: var(--space-24);
+            right: var(--space-24);
+            width: 350px;
+            max-height: 500px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        .chatbot-header {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            padding: var(--space-16);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            font-weight: var(--font-weight-semibold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: var(--color-btn-primary-text);
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: var(--space-16);
+            overflow-y: auto;
+            max-height: 350px;
+        }
+
+        .message {
+            margin-bottom: var(--space-12);
+            padding: var(--space-10);
+            border-radius: var(--radius-base);
+            max-width: 80%;
+        }
+
+        .message.bot {
+            background: var(--color-bg-1);
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .chatbot-input {
+            display: flex;
+            gap: var(--space-8);
+            padding: var(--space-16);
+            border-top: 1px solid var(--color-card-border);
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: var(--space-8);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+        }
+
+        .chatbot-input button {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            border: none;
+            padding: var(--space-8) var(--space-16);
+            border-radius: var(--radius-base);
+            cursor: pointer;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: var(--space-24);
+            right: var(--space-24);
+            width: 60px;
+            height: 60px;
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            border: none;
+            border-radius: 50%;
+            font-size: var(--font-size-2xl);
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 998;
+        }
+
+        .chatbot-toggle:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Feature Cards */
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-24);
+            margin: var(--space-32) 0;
+        }
+
+        .feature-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-16);
+        }
+
+        .feature-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        .feature-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        /* Counter Section */
+        .counter-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 35px;
+            border-radius: 20px;
+            text-align: center;
+            margin: var(--space-32) auto;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .counter-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: var(--space-8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-12);
+        }
+
+        .counter-icon {
+            font-size: 2.5rem;
+        }
+
+        .counter-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        /* Submit Button */
+        .btn-large {
+            padding: var(--space-16) var(--space-32);
+            font-size: var(--font-size-lg);
+            margin: var(--space-24) auto;
+            display: block;
+            min-width: 250px;
+        }
+
+        /* Login Grid */
+        .login-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-32);
+            margin: var(--space-32) 0;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-32);
+            padding: var(--space-24);
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+            padding: var(--space-8) var(--space-20);
+            border: none;
+            border-radius: var(--radius-base);
+            cursor: pointer;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* Stat Cards Grid */
+        .stat-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-20);
+            margin-bottom: var(--space-32);
+        }
+
+        .stat-card-dashboard {
+            padding: var(--space-24);
+            border-radius: var(--radius-lg);
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform var(--duration-fast) var(--ease-standard);
+        }
+
+        .stat-card-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card-dashboard.purple {
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card-dashboard.pink {
+            border-left: 4px solid #ec4899;
+        }
+
+        .stat-card-dashboard.blue {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .stat-card-dashboard.green {
+            border-left: 4px solid #10b981;
+        }
+
+        .stat-card-dashboard .stat-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card-dashboard .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: var(--space-24);
+            margin-bottom: var(--space-32);
+        }
+
+        .chart-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+
+        .chart-wrapper {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Map Container */
+        .map-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-32);
+        }
+
+        .map-wrapper {
+            height: 400px;
+            border-radius: var(--radius-base);
+            overflow: hidden;
+        }
+
+        .map-wrapper-compact {
+            height: 250px;
+            border-radius: var(--radius-base);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-legend {
+            display: flex;
+            gap: var(--space-20);
+            margin-top: var(--space-16);
+            flex-wrap: wrap;
+        }
+
+        .map-legend-compact {
+            display: flex;
+            gap: var(--space-12);
+            margin-top: var(--space-12);
+            flex-wrap: wrap;
+            font-size: var(--font-size-sm);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .map-legend-compact .legend-color {
+            width: 16px;
+            height: 16px;
+        }
+
+        .map-legend-compact .legend-item {
+            font-size: var(--font-size-xs);
+        }
+
+        /* Feedback Table */
+        .table-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            overflow-x: auto;
+        }
+
+        .feedback-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .feedback-table th,
+        .feedback-table td {
+            padding: var(--space-12);
+            text-align: left;
+            border-bottom: 1px solid var(--color-card-border);
+        }
+
+        .feedback-table th {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text);
+            background: var(--color-bg-1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-4) var(--space-12);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .badge.pending {
+            background: var(--color-bg-2);
+            color: #d97706;
+        }
+
+        .badge.in-progress {
+            background: var(--color-bg-1);
+            color: #2563eb;
+        }
+
+        .badge.resolved {
+            background: var(--color-bg-3);
+            color: #16a34a;
+        }
+
+        .badge.positive {
+            background: var(--color-bg-3);
+            color: #16a34a;
+        }
+
+        .badge.negative {
+            background: var(--color-bg-4);
+            color: #dc2626;
+        }
+
+        .badge.neutral {
+            background: var(--color-bg-8);
+            color: #0891b2;
+        }
+
+        .btn-small {
+            padding: var(--space-4) var(--space-12);
+            font-size: var(--font-size-sm);
+            border: none;
+            border-radius: var(--radius-base);
+            cursor: pointer;
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .btn-small:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* Photo Upload */
+        .photo-upload {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-24);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color var(--duration-fast);
+        }
+
+        .photo-upload:hover {
+            border-color: var(--color-primary);
+        }
+
+        .photo-preview {
+            display: flex;
+            gap: var(--space-12);
+            flex-wrap: wrap;
+            margin-top: var(--space-16);
+        }
+
+        .photo-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-card-border);
+        }
+
+        /* Thank You Message */
+        .thank-you-message {
+            background: var(--color-bg-3);
+            border: 1px solid #16a34a;
+            color: #16a34a;
+            padding: var(--space-20);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin: var(--space-24) 0;
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-card-border);
+            padding: var(--space-24);
+            text-align: center;
+            color: var(--color-text-secondary);
+            margin-top: var(--space-32);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: var(--space-8);
+                font-size: var(--font-size-sm);
+            }
+
+            .nav-button {
+                padding: var(--space-6) var(--space-12);
+                font-size: var(--font-size-sm);
+            }
+
+            .logo-section {
+                font-size: var(--font-size-base);
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .stats-grid,
+            .feature-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chatbot-container {
+                width: calc(100% - 48px);
+                right: var(--space-24);
+            }
+
+            .stat-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: var(--space-16);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo-section">
+                <span class="logo-icon">🏙️</span>
+                <span>Civic Feedback</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a class="nav-link" onclick="showPage('home')">Home</a></li>
+                <li><button class="nav-button" onclick="showPage('login')">Admin Login</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="hero-section">
+                <h1 class="hero-title">Giving Citizens a Voice</h1>
+                <p class="hero-subtitle">Your feedback helps us build a better city for everyone</p>
+                <p class="hero-appreciation">
+                    Thank you for being an active participant in making Palakkad smarter and more livable. Your voice matters, and every piece of feedback you share helps our city administration identify issues, prioritize solutions, and deliver better services to all residents. Together, we are building a city that listens, responds, and grows with the needs of its people.
+                </p>
+            </div>
+
+            <!-- Counter Section -->
+            <div class="counter-section">
+                <div class="counter-number">
+                    <span id="feedbackCounter">0</span>
+                </div>
+                <div class="counter-label">Total Feedback Received</div>
+            </div>
+
+            <!-- Submit Feedback Button -->
+            <button class="btn-primary btn-large" onclick="showPage('feedback')">Submit Feedback</button>
+
+            <!-- About Section -->
+            <div class="content-section" style="margin-top: var(--space-32);">
+                <h2 class="section-title">About Civic Feedback</h2>
+                <p class="section-text">
+                    Civic Feedback is an initiative to transform our city into a modern, citizen-centric urban space. We believe in the power of citizen feedback to drive positive change and improve the quality of life for all residents.
+                </p>
+                <p class="section-text">
+                    Our platform enables citizens to easily share their feedback, concerns, and suggestions about various aspects of city services including infrastructure, sanitation, transport, and utilities. Every piece of feedback is valuable and helps us prioritize improvements and allocate resources effectively.
+                </p>
+                <h4 class="section-title" style="font-size: var(--font-size-lg); margin-top: var(--space-24); font-weight: var(--font-weight-bold);">Our Mission</h4>
+                <p class="section-text">
+                    To create a responsive, efficient, and inclusive city governance system that empowers every citizen to participate in shaping the future of Palakkad.
+                </p>
+                <h4 class="section-title" style="font-size: var(--font-size-lg); margin-top: var(--space-24); font-weight: var(--font-weight-bold);">Our Vision</h4>
+                <p class="section-text">
+                    To be recognized as a model smart city that leverages technology and citizen engagement to deliver exceptional quality of life and sustainable urban development.
+                </p>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="content-section">
+                <h2 class="section-title">Contact Us</h2>
+                <p class="section-text">
+                    <strong>Civic Feedback Palakkad Office</strong>
+                </p>
+                <p class="section-text">
+                    Municipal Corporation Building, Fort Maidan<br>
+                    Palakkad, Kerala - 678001
+                </p>
+                <p class="section-text">
+                    <strong>Phone:</strong> +91-491-2566600<br>
+                    <strong>Email:</strong> <a href="mailto:contact@civicfeedback.gov.in" style="color: var(--color-primary); text-decoration: none;">contact@civicfeedback.gov.in</a><br>
+                    <strong>Office Hours:</strong> Monday - Friday: 9:00 AM - 5:30 PM
+                </p>
+                <p class="section-text" style="margin-top: var(--space-20); padding: var(--space-16); background: var(--color-bg-4); border-radius: var(--radius-base); border-left: 4px solid var(--color-error);">
+                    <strong>For urgent issues, please call:</strong> 1800-XXX-XXXX
+                </p>
+            </div>
+        </div>
+
+        <!-- Feedback Submission Page -->
+        <div id="feedback" class="page">
+            <button class="back-to-home" onclick="showPage('home')">
+                Back to Home
+            </button>
+            <div class="form-section">
+                <h2 class="form-title">Share Your Feedback</h2>
+                <p class="hero-subtitle" style="text-align: center; margin-bottom: var(--space-24);">Help us make Palakkad a better place! Please share your feedback below.</p>
+                
+                <div id="thankYouMessage" class="thank-you-message hidden">
+                    Thank you for helping us improve the city! Your feedback makes Palakkad smarter and better.
+                </div>
+
+                <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="userType">User Type</label>
+                        <select id="userType" class="form-control" required onchange="handleUserTypeChange()">
+                            <option value="">Select user type</option>
+                            <option value="Citizen">🏠 Citizen</option>
+                            <option value="Anonymous">🕵️ Anonymous User</option>
+                            <option value="Guest">🎒 Guest / Visitor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="houseNumberGroup">
+                        <label class="form-label" for="houseNumber">House Number</label>
+                        <input type="text" id="houseNumber" class="form-control" placeholder="e.g., TC 14/245">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category</label>
+                        <select id="category" class="form-control" required>
+                            <option value="">Select a category</option>
+                            <option value="Roads & Transportation">🛣️ Roads &amp; Transportation</option>
+                            <option value="Streetlights & Electricity">💡 Streetlights &amp; Electricity</option>
+                            <option value="Water Supply">💧 Water Supply</option>
+                            <option value="Waste Management">🗑️ Waste Management</option>
+                            <option value="Parks & Cleanliness">🌳 Parks &amp; Cleanliness</option>
+                            <option value="Public Safety">🚓 Public Safety</option>
+                            <option value="Health & Sanitation">🏥 Health &amp; Sanitation</option>
+                            <option value="Communication / Public Services">📞 Communication / Public Services</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="description">Issue Description</label>
+                        <textarea id="description" class="form-control" placeholder="Please describe the issue in detail..." required style="min-height: 150px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Photo Upload (Optional)</label>
+                        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+                            <div>📷 Click to upload photos (JPG/PNG)</div>
+                            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--space-8);">You can upload multiple images</div>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/jpeg,image/png" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+                        <div id="photoPreview" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location Selection</label>
+                        <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-12);">Click on the map to pin the exact location of the issue</div>
+                        <div id="feedbackMap" class="map-wrapper"></div>
+                        <div style="margin-top: var(--space-12); font-size: var(--font-size-sm); color: var(--color-text-secondary);" id="selectedLocation">Selected: Click on map to select location</div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="about" class="page">
+            <div class="content-section">
+                <h1 class="section-title">About Civic Feedback</h1>
+                <p class="section-text">
+                    Civic Feedback is an initiative to transform our city into a modern, citizen-centric urban space. 
+                    We believe in the power of citizen feedback to drive positive change and improve the quality of life for all residents.
+                </p>
+                <p class="section-text">
+                    Our platform enables citizens to easily share their feedback, concerns, and suggestions about various 
+                    aspects of city services including infrastructure, sanitation, transport, and utilities. Every piece of 
+                    feedback is valuable and helps us prioritize improvements and allocate resources effectively.
+                </p>
+                <h2 class="section-title">Our Mission</h2>
+                <p class="section-text">
+                    To create a responsive, efficient, and inclusive city governance system that empowers every citizen 
+                    to participate in shaping the future of Palakkad.
+                </p>
+                <h2 class="section-title">Our Vision</h2>
+                <p class="section-text">
+                    To be recognized as a model smart city that leverages technology and citizen engagement to deliver 
+                    exceptional quality of life and sustainable urban development.
+                </p>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <div class="content-section">
+                <h1 class="section-title">Contact Us</h1>
+                <p class="section-text">
+                    We're here to help and answer any questions you might have. We look forward to hearing from you.
+                </p>
+                <h2 class="section-title">Office Address</h2>
+                <p class="section-text">
+                    Civic Feedback Palakkad Office<br>
+                    Municipal Corporation Building<br>
+                    Palakkad, Kerala - 678001<br>
+                    India
+                </p>
+                <h2 class="section-title">Contact Information</h2>
+                <p class="section-text">
+                    <strong>Phone:</strong> +91 491 2534567<br>
+                    <strong>Email:</strong> contact@civicfeedback.gov.in<br>
+                    <strong>Hours:</strong> Monday - Friday, 9:00 AM - 5:00 PM
+                </p>
+                <h2 class="section-title">Emergency Services</h2>
+                <p class="section-text">
+                    For urgent issues requiring immediate attention, please call our 24/7 helpline: <strong>1800-425-1234</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="login-page-wrapper">
+                <button class="back-to-home" onclick="showPage('home')">
+                    ← Back to Home
+                </button>
+                
+                <div class="login-container">
+                    <div class="admin-portal-header">
+                        <div class="admin-portal-icon">🏙️</div>
+                        <h1 class="admin-portal-title">Admin Portal</h1>
+                    </div>
+                    
+                    <div class="login-card">
+                        <div class="login-tabs">
+                            <button class="login-tab active" onclick="switchLoginTab('main-admin')" id="mainAdminTab">
+                                Main Admin
+                            </button>
+                            <button class="login-tab" onclick="switchLoginTab('department-admin')" id="departmentAdminTab">
+                                Department Admin
+                            </button>
+                        </div>
+                        
+                        <div class="login-form-container">
+                            <!-- Main Admin Form -->
+                            <div class="login-form-content active" id="mainAdminForm">
+                                <h2 class="login-form-heading">Main Admin Login</h2>
+                                <form onsubmit="handleMainLogin(event)">
+                                    <div class="form-group">
+                                        <label class="form-label" for="admin-email">Email</label>
+                                        <input type="email" id="admin-email" class="form-control" placeholder="Enter the mail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="admin-password">Password</label>
+                                        <input type="password" id="admin-password" class="form-control" placeholder="Enter password" required>
+                                    </div>
+                                    <button type="submit" class="btn-blue">Sign In as Main Admin</button>
+                                </form>
+                            </div>
+                            
+                            <!-- Department Admin Form -->
+                            <div class="login-form-content" id="departmentAdminForm">
+                                <h2 class="login-form-heading">Department Admin Login</h2>
+                                <form onsubmit="handleDepartmentLogin(event)">
+                                    <div class="form-group">
+                                        <label class="form-label" for="dept-select">Select Department</label>
+                                        <select id="dept-select" class="form-control" required>
+                                            <option value="">Choose department...</option>
+                                            <option value="Roads & Transportation">Roads &amp; Transportation</option>
+                                            <option value="Streetlights & Electricity">Streetlights &amp; Electricity</option>
+                                            <option value="Water Supply">Water Supply</option>
+                                            <option value="Waste Management">Waste Management</option>
+                                            <option value="Parks & Cleanliness">Parks &amp; Cleanliness</option>
+                                            <option value="Public Safety">Public Safety</option>
+                                            <option value="Health & Sanitation">Health &amp; Sanitation</option>
+                                            <option value="Communication / Public Services">Communication / Public Services</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="dept-password">Password</label>
+                                        <input type="password" id="dept-password" class="form-control" placeholder="Enter password" required>
+                                    </div>
+                                    <button type="submit" class="btn-blue">Sign In as Department Admin</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Admin Dashboard -->
+        <div id="main-dashboard" class="page">
+            <button class="back-to-home" onclick="showPage('home')">
+                Back to Home
+            </button>
+            <div class="dashboard-header">
+                <h1>Main Admin Dashboard</h1>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="stat-cards-grid">
+                <div class="stat-card-dashboard purple">
+                    <div class="stat-label">TOTAL FEEDBACK</div>
+                    <div class="stat-number" id="totalFeedback">0</div>
+                </div>
+                <div class="stat-card-dashboard pink">
+                    <div class="stat-label">PENDING</div>
+                    <div class="stat-number" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card-dashboard blue">
+                    <div class="stat-label">IN PROGRESS</div>
+                    <div class="stat-number" id="inProgressCount">0</div>
+                </div>
+                <div class="stat-card-dashboard green">
+                    <div class="stat-label">RESOLVED</div>
+                    <div class="stat-number" id="resolvedCount">0</div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1: Category and Status -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Category Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Status Overview</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="statusBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2: Sentiment Analysis and Hotspots Map -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Sentiment Analysis</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="sentimentBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Feedback Hotspots Map</h3>
+                    <div class="map-wrapper-compact">
+                        <div id="hotspotMap" style="height: 100%; border-radius: var(--radius-base); overflow: hidden;"></div>
+                    </div>
+                    <div class="map-legend-compact">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ef4444;"></div>
+                            <span>High Issues (5+)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f59e0b;"></div>
+                            <span>Medium Issues (2-4)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10b981;"></div>
+                            <span>Few Issues (1)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Table -->
+            <div class="table-container">
+                <h3 class="chart-title">All Feedback Submissions</h3>
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Type</th>
+                            <th>Category</th>
+                            <th style="min-width: 300px;">Description</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Sentiment</th>
+                            <th style="min-width: 150px;">Photos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedbackTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Department Admin Dashboard -->
+        <div id="dept-dashboard" class="page">
+            <button class="back-to-home" onclick="showPage('home')">
+                Back to Home
+            </button>
+            <div class="dashboard-header">
+                <h1 id="deptDashboardTitle">Department Dashboard</h1>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="stat-cards-grid">
+                <div class="stat-card-dashboard purple">
+                    <div class="stat-label">TOTAL FEEDBACK</div>
+                    <div class="stat-number" id="deptTotalFeedback">0</div>
+                </div>
+                <div class="stat-card-dashboard pink">
+                    <div class="stat-label">PENDING</div>
+                    <div class="stat-number" id="deptPendingCount">0</div>
+                </div>
+                <div class="stat-card-dashboard blue">
+                    <div class="stat-label">IN PROGRESS</div>
+                    <div class="stat-number" id="deptInProgressCount">0</div>
+                </div>
+                <div class="stat-card-dashboard green">
+                    <div class="stat-label">RESOLVED</div>
+                    <div class="stat-number" id="deptResolvedCount">0</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Status Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="deptStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Sentiment Analysis</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="deptSentimentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Hotspots Map -->
+            <div class="map-container">
+                <h3 class="chart-title">Department Feedback Locations</h3>
+                <div id="deptHotspotMap" class="map-wrapper"></div>
+            </div>
+
+            <!-- Department Feedback Table -->
+            <div class="table-container">
+                <h3 class="chart-title">Department Feedback</h3>
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Type</th>
+                            <th style="min-width: 300px;">Description</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Sentiment</th>
+                            <th>Actions</th>
+                            <th style="min-width: 150px;">Photos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deptFeedbackTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Powered by AI &amp; Community Feedback • Civic Feedback Initiative
+    </footer>
+
+    <!-- Chatbot Toggle Button -->
+    <button class="chatbot-toggle" onclick="toggleChatbot()" id="chatbotToggle">💬</button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container hidden" id="chatbotContainer">
+        <div class="chatbot-header">
+            <span>Civic Feedback Assistant</span>
+            <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="message bot">Hello! How can I help you today?</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatKeypress(event)">
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Global chart instances
+        let chartInstances = {};
+
+        // Function to destroy chart if it exists
+        function destroyChartIfExists(chartId) {
+            if (chartInstances[chartId]) {
+                chartInstances[chartId].destroy();
+                chartInstances[chartId] = null;
+            }
+        }
+
+        // Function to clean up all charts
+        function cleanupAllCharts() {
+            const chartIds = ['categoryPieChart', 'statusBarChart', 'sentimentBarChart', 
+                            'deptStatusChart', 'deptSentimentChart'];
+            chartIds.forEach(id => destroyChartIfExists(id));
+        }
+
+        // Fetch initial stats when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStats();
+        });
+
+        // Application State (In-Memory Storage)
+        let appState = {
+            currentUser: null,
+            currentDepartment: null,
+            feedbackData: [],
+            selectedLocation: null,
+            uploadedPhotos: [],
+            maps: {}
+        };
+
+        // Page Navigation
+        function showPage(pageName) {
+            // Clean up all charts when switching pages
+            cleanupAllCharts();
+            
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName).classList.add('active');
+            window.scrollTo(0, 0);
+
+            // Control chatbot visibility based on page
+            updateChatbotVisibility(pageName);
+
+            // Initialize maps when needed
+            if (pageName === 'feedback') {
+                setTimeout(() => initFeedbackMap(), 100);
+            } else if (pageName === 'main-dashboard') {
+                setTimeout(() => {
+                    updateMainDashboard();
+                    initHotspotMap();
+                }, 100);
+            } else if (pageName === 'dept-dashboard') {
+                setTimeout(() => {
+                    updateDeptDashboard();
+                    initDeptHotspotMap();
+                }, 100);
+            }
+        }
+
+        // Update Feedback Counter
+        function updateFeedbackCounter() {
+            const counter = document.getElementById('feedbackCounter');
+            if (counter) {
+                counter.textContent = appState.feedbackData.length;
+            }
+        }
+
+        // Control Chatbot Visibility Based on Current Page
+        function updateChatbotVisibility(pageName) {
+            const chatbotToggle = document.getElementById('chatbotToggle');
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            
+            // Pages where chatbot should be visible
+            const chatbotEnabledPages = ['home', 'feedback'];
+            
+            if (chatbotEnabledPages.includes(pageName)) {
+                // Show chatbot toggle button
+                chatbotToggle.style.display = 'block';
+            } else {
+                // Hide chatbot toggle button and close chatbot if open
+                chatbotToggle.style.display = 'none';
+                chatbotContainer.classList.add('hidden');
+            }
+        }
+
+        // Handle User Type Change
+        function handleUserTypeChange() {
+            const userType = document.getElementById('userType').value;
+            const houseNumberGroup = document.getElementById('houseNumberGroup');
+            const houseNumberInput = document.getElementById('houseNumber');
+            
+            if (userType === 'Citizen') {
+                houseNumberGroup.classList.remove('hidden');
+                houseNumberInput.required = true;
+            } else {
+                houseNumberGroup.classList.add('hidden');
+                houseNumberInput.required = false;
+                houseNumberInput.value = '';
+            }
+        }
+
+        // Handle Photo Upload
+        function handlePhotoUpload(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            appState.uploadedPhotos = [];
+            
+            const validFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const maxFileSize = 5 * 1024 * 1024; // 5MB
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Validate file type and size
+                if (!validFileTypes.includes(file.type)) {
+                    alert(`File "${file.name}" is not a supported image type. Please use JPG, PNG, or GIF.`);
+                    continue;
+                }
+                
+                if (file.size > maxFileSize) {
+                    alert(`File "${file.name}" is too large. Maximum file size is 5MB.`);
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                    appState.uploadedPhotos.push(e.target.result);
+                    console.log('Photo added to uploadedPhotos array:', e.target.result.substring(0, 50) + '...');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Initialize Feedback Map
+        function initFeedbackMap() {
+            if (appState.maps.feedbackMap) return;
+            
+            // Define Palakkad city bounds
+            const palakkadBounds = L.latLngBounds(
+                [10.72, 76.59],  // Southwest corner
+                [10.85, 76.72]   // Northeast corner
+            );
+            
+            const map = L.map('feedbackMap', {
+                center: [10.7867, 76.6548],
+                zoom: 13,
+                minZoom: 11,
+                maxZoom: 16,
+                maxBounds: palakkadBounds,
+                maxBoundsViscosity: 1.0
+            });
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            let marker = null;
+            map.on('click', function(e) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+                appState.selectedLocation = { lat: e.latlng.lat, lng: e.latlng.lng };
+                document.getElementById('selectedLocation').textContent = 
+                    `Selected: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+            });
+            
+            appState.maps.feedbackMap = map;
+        }
+
+        // Analyze Sentiment (Simple rule-based)
+        function analyzeSentiment(text) {
+            const positiveWords = ['good', 'great', 'excellent', 'thank', 'beautiful', 'nice', 'love', 'appreciate', 'wonderful'];
+            const negativeWords = ['bad', 'poor', 'terrible', 'issue', 'problem', 'broken', 'damage', 'urgent', 'danger', 'not working'];
+            
+            const lowerText = text.toLowerCase();
+            let positiveCount = 0;
+            let negativeCount = 0;
+            
+            positiveWords.forEach(word => {
+                if (lowerText.includes(word)) positiveCount++;
+            });
+            
+            negativeWords.forEach(word => {
+                if (lowerText.includes(word)) negativeCount++;
+            });
+            
+            if (positiveCount > negativeCount) return 'Positive';
+            if (negativeCount > positiveCount) return 'Negative';
+            return 'Neutral';
+        }
+
+        // Submit Feedback
+        async function submitFeedback(event) {
+            event.preventDefault();
+            
+            if (!appState.selectedLocation) {
+                alert('Please select a location on the map.');
+                return;
+            }
+            
+            const userType = document.getElementById('userType').value;
+            const houseNumber = document.getElementById('houseNumber').value;
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+
+            // Add house_number only if userType is Citizen
+            const formData = {
+                user_type: userType,
+                category: category,
+                description: description,
+                location: `${appState.selectedLocation.lat.toFixed(4)}, ${appState.selectedLocation.lng.toFixed(4)}`
+            };
+            if (userType === 'Citizen' && houseNumber) {
+                formData.house_number = houseNumber;
+            }
+
+            try {
+                // Add photos to form data if they exist
+                if (appState.uploadedPhotos.length > 0) {
+                    formData.photos = appState.uploadedPhotos;
+                }
+                
+                const response = await fetch('http://localhost:8000/api/submit/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Add to local state for immediate UI update
+                    const feedback = {
+                        id: appState.feedbackData.length + 1,
+                        userType: userType,
+                        category: category,
+                        description: description,
+                        location: appState.selectedLocation,
+                        locationText: `${appState.selectedLocation.lat.toFixed(4)}, ${appState.selectedLocation.lng.toFixed(4)}`,
+                        status: 'Pending',
+                        sentiment: analyzeSentiment(description),
+                        date: new Date().toISOString().split('T')[0],
+                        photos: appState.uploadedPhotos || [],
+                        houseNumber: userType === 'Citizen' ? houseNumber : undefined
+                    };
+                    
+                    // Log the photos being added
+                    console.log('Photos being added to feedback:', appState.uploadedPhotos);
+                    
+                    appState.feedbackData.push(feedback);
+                    updateFeedbackCounter();
+                } else {
+                    alert('Error submitting feedback');
+                }
+            } catch(error) {
+                console.error('Error:', error);
+                alert('Error submitting feedback');
+            }
+            
+            // Show thank you message
+            document.getElementById('thankYouMessage').classList.remove('hidden');
+            document.getElementById('feedbackForm').reset();
+            appState.selectedLocation = null;
+            appState.uploadedPhotos = [];
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('selectedLocation').textContent = 'Selected: Click on map to select location';
+            
+            // Hide thank you message and redirect after 3 seconds
+            setTimeout(() => {
+                document.getElementById('thankYouMessage').classList.add('hidden');
+                showPage('home');
+            }, 3000);
+        }
+
+        // Fetch Feedback Data
+        async function fetchFeedbackData() {
+            try {
+                console.log('Fetching feedback data...');
+                const response = await fetch('http://localhost:8000/api/list/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received data:', data);
+                
+                // Debug log to check photos in the response
+                data.forEach((item, index) => {
+                    console.log(`Item ${index} photos:`, item.photos);
+                });
+                
+                if (!Array.isArray(data)) {
+                    console.error('Received non-array data:', data);
+                    throw new Error('Invalid data format received from server');
+                }
+                
+                // Normalize backend data to frontend shape
+                appState.feedbackData = data.map(item => {
+                    // Normalize status to consistent display form (e.g. 'in-progress' -> 'In Progress')
+                    let rawStatus = (item.status || '').toString();
+                    let status = 'Pending';
+                    if (rawStatus) {
+                        status = rawStatus.replace(/-/g, ' ').split(' ').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+                    }
+
+                    // Normalize user type
+                    const userType = item.user_type || item.userType || 'citizen';
+
+                    // Normalize sentiment
+                    const sentiment = item.sentiment || 'Neutral';
+
+                    // Normalize location: backend may send a string like "lat, lng"
+                    let locationObj = null;
+                    let locationText = '';
+                    if (item.location && typeof item.location === 'string') {
+                        const parts = item.location.split(',').map(s => s.trim());
+                        if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+                            locationObj = { lat: parseFloat(parts[0]), lng: parseFloat(parts[1]) };
+                            locationText = `${parts[0]}, ${parts[1]}`;
+                        } else {
+                            locationText = item.location;
+                        }
+                    } else if (item.location && typeof item.location === 'object' && item.location.lat && item.location.lng) {
+                        locationObj = item.location;
+                        locationText = `${item.location.lat}, ${item.location.lng}`;
+                    }
+
+                    // Normalize house number for citizen
+                    let houseNumber = undefined;
+                    if ((userType === 'Citizen' || userType === 'citizen') && (item.house_number || item.houseNumber)) {
+                        houseNumber = item.house_number || item.houseNumber;
+                    }
+
+                    const normalized = Object.assign({}, item, {
+                        userType: userType,
+                        status: status,
+                        sentiment: sentiment,
+                        location: locationObj || item.location,
+                        locationText: locationText || item.location || '',
+                        houseNumber: houseNumber
+                    });
+
+                    // Ensure photos array exists and is properly formatted
+                    const photos = item.photos || [];
+                    normalized.photos = Array.isArray(photos) ? photos : [];
+
+                    return normalized;
+                });
+
+                console.log('Updated (normalized) appState:', appState.feedbackData);
+
+                updateFeedbackCounter();
+                if (appState.currentUser === 'main_admin') {
+                    updateMainDashboard();
+                } else if (appState.currentUser === 'department_admin') {
+                    updateDeptDashboard();
+                }
+            } catch (error) {
+                console.error('Error fetching feedback:', error);
+                alert(`Error fetching feedback data: ${error.message}`);
+            }
+        }
+
+        // Fetch Statistics
+        async function fetchStats() {
+            try {
+                const response = await fetch('http://localhost:8000/api/stats/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const stats = await response.json();
+                document.getElementById('feedbackCounter').textContent = stats.total;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Render Department Feedback Table
+        function renderDeptFeedbackTable(deptFeedback) {
+            const tableBody = document.getElementById('deptFeedbackTableBody');
+            tableBody.innerHTML = '';
+            
+            deptFeedback.forEach(feedback => {
+                const row = document.createElement('tr');
+                let photosCell = '';
+                if (Array.isArray(feedback.photos) && feedback.photos.length > 0) {
+                    photosCell = feedback.photos.map(photo => `<img src='${photo}' style='width:40px;height:40px;border-radius:6px;margin-right:4px;border:1px solid #ccc;' alt='photo' />`).join('');
+                }
+                row.innerHTML = `
+                    <td>${feedback.id}</td>
+                    <td>${feedback.userType}</td>
+                    <td>${feedback.description.substring(0, 50)}...</td>
+                    <td>${feedback.locationText}</td>
+                    <td>
+                        <select class="status-select" onchange="updateFeedbackStatus(${feedback.id}, this.value)">
+                            <option value="pending" ${feedback.status?.toLowerCase() === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="in-progress" ${feedback.status?.toLowerCase() === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="resolved" ${feedback.status?.toLowerCase() === 'resolved' ? 'selected' : ''}>Resolved</option>
+                        </select>
+                    </td>
+                    <td><span class="badge ${feedback.sentiment.toLowerCase()}">${feedback.sentiment}</span></td>
+                    <td>
+                        <button class="btn-small" onclick="viewFeedbackDetails(${feedback.id})">View Details</button>
+                    </td>
+                    <td>${photosCell}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update feedback status
+        async function updateFeedbackStatus(feedbackId, newStatus) {
+            try {
+                console.log(`Updating feedback ${feedbackId} status to ${newStatus}`);
+                const response = await fetch(`http://localhost:8000/api/update-status/${feedbackId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Update result:', result);
+
+                if (result.success) {
+                    // Update local state display and refresh data from server for consistency
+                    const feedback = appState.feedbackData.find(f => f.id === feedbackId);
+                    // Convert server status (e.g. 'in-progress') to display form 'In Progress'
+                    const displayStatus = newStatus.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+                    if (feedback) {
+                        feedback.status = displayStatus;
+                    }
+
+                    // Re-fetch data to ensure both dashboards stay in sync
+                    await fetchFeedbackData();
+
+                    alert('Status updated successfully!');
+                } else {
+                    throw new Error(result.message || 'Error updating status');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Error updating status: ${error.message}`);
+            }
+        }
+
+        // Function to view feedback details
+        function viewFeedbackDetails(feedbackId) {
+            const feedback = appState.feedbackData.find(f => f.id === feedbackId);
+            if (feedback) {
+                alert(`
+                    Feedback Details:
+                    ID: ${feedback.id}
+                    User Type: ${feedback.user_type}
+                    Category: ${feedback.category}
+                    Description: ${feedback.description}
+                    Location: ${feedback.location}
+                    Status: ${feedback.status}
+                    Created At: ${new Date(feedback.created_at).toLocaleString()}
+                `);
+            }
+        }
+
+        // Department Admin Login
+        function handleDepartmentLogin(event) {
+            event.preventDefault();
+            const department = document.getElementById('dept-select').value;
+            const password = document.getElementById('dept-password').value;
+            
+            if (password === 'department123') {
+                appState.currentUser = 'department_admin';
+                appState.currentDepartment = department;
+                fetchFeedbackData();
+                showPage('dept-dashboard');
+            } else {
+                alert('Invalid password!');
+            }
+        }
+
+        // Main Admin Login
+        function handleMainLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            
+            if (email === 'admin@city.com' && password === 'admin123') {
+                appState.currentUser = 'main_admin';
+                fetchFeedbackData();
+                showPage('main-dashboard');
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        // Logout
+        function logout() {
+            // Clean up all charts
+            cleanupAllCharts();
+            
+            // Clear application state
+            appState.currentUser = null;
+            appState.currentDepartment = null;
+            appState.feedbackData = [];
+            
+            showPage('home');
+        }
+
+        // Update Main Dashboard
+        function updateMainDashboard() {
+            console.log('Updating main dashboard with data:', appState.feedbackData);
+            // Clean up existing charts
+            cleanupAllCharts();
+            
+            const stats = calculateStats(appState.feedbackData);
+            
+            document.getElementById('totalFeedback').textContent = stats.total;
+            document.getElementById('pendingCount').textContent = stats.pending;
+            document.getElementById('inProgressCount').textContent = stats.inProgress;
+            document.getElementById('resolvedCount').textContent = stats.resolved;
+            
+            renderMainCharts();
+            renderFeedbackTable();
+        }
+
+        // Update Department Dashboard
+        function updateDeptDashboard() {
+            // Clean up existing charts
+            cleanupAllCharts();
+            
+            // Filter feedback for current department
+            const deptFeedback = Array.isArray(appState.feedbackData) ? 
+                appState.feedbackData.filter(f => f.category === appState.currentDepartment) : [];
+            
+            const stats = calculateStats(deptFeedback);
+            
+            // Update dashboard title and stats
+            document.getElementById('deptDashboardTitle').textContent = `${appState.currentDepartment} - Dashboard`;
+            document.getElementById('deptTotalFeedback').textContent = stats.total;
+            document.getElementById('deptPendingCount').textContent = stats.pending;
+            document.getElementById('deptInProgressCount').textContent = stats.inProgress;
+            document.getElementById('deptResolvedCount').textContent = stats.resolved;
+            
+            // Render department-specific charts and table
+            renderDeptCharts(deptFeedback);
+            renderDeptFeedbackTable(deptFeedback);
+        }
+
+        // Calculate Statistics
+        function calculateStats(data) {
+            if (!Array.isArray(data)) {
+                console.error('Invalid data passed to calculateStats:', data);
+                return {
+                    total: 0,
+                    pending: 0,
+                    inProgress: 0,
+                    resolved: 0
+                };
+            }
+            return {
+                total: data.length,
+                pending: data.filter(f => f.status?.toLowerCase() === 'pending').length,
+                inProgress: data.filter(f => f.status?.toLowerCase() === 'in-progress').length,
+                resolved: data.filter(f => f.status?.toLowerCase() === 'resolved').length
+            };
+        }
+
+        // Function to create or update a chart
+        function createChart(canvasId, type, data, options) {
+            // Destroy existing chart if it exists
+            destroyChartIfExists(canvasId);
+            
+            // Create new chart
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) {
+                console.error(`Canvas with id ${canvasId} not found`);
+                return null;
+            }
+            
+            chartInstances[canvasId] = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: options || {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            return chartInstances[canvasId];
+        }
+
+        // Render Main Admin Charts
+        function renderMainCharts() {
+            // Clean up existing charts before rendering new ones
+            cleanupAllCharts();
+
+            // Category Distribution Pie Chart
+            const categories = {};
+            appState.feedbackData.forEach(f => {
+                categories[f.category] = (categories[f.category] || 0) + 1;
+            });
+            
+            createChart('categoryPieChart', 'pie', {
+                labels: Object.keys(categories),
+                datasets: [{
+                    data: Object.values(categories),
+                    backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325']
+                }]
+            });
+
+            // Status Bar Chart
+            const stats = calculateStats(appState.feedbackData);
+            createChart('statusBarChart', 'bar', {
+                labels: ['Pending', 'In Progress', 'Resolved'],
+                datasets: [{
+                    label: 'Count',
+                    data: [stats.pending, stats.inProgress, stats.resolved],
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            });
+
+            // Sentiment Bar Chart
+            const sentiments = { Positive: 0, Negative: 0, Neutral: 0 };
+            appState.feedbackData.forEach(f => {
+                sentiments[f.sentiment]++;
+            });
+
+            createChart('sentimentBarChart', 'bar', {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    label: 'Feedback Count',
+                    data: [sentiments.Positive, sentiments.Neutral, sentiments.Negative],
+                    backgroundColor: ['#10b981', '#6b7280', '#ef4444']
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            });
+        }
+
+        // Render Department Charts
+        function renderDeptCharts(deptFeedback) {
+            // Clean up existing charts before rendering new ones
+            cleanupAllCharts();
+
+            // Status Chart
+            const statusCounts = {
+                'pending': 0,
+                'in-progress': 0,
+                'resolved': 0
+            };
+            
+            deptFeedback.forEach(feedback => {
+                statusCounts[feedback.status.toLowerCase()]++;
+            });
+
+            createChart('deptStatusChart', 'doughnut', {
+                labels: ['Pending', 'In Progress', 'Resolved'],
+                datasets: [{
+                    data: [statusCounts.pending, statusCounts['in-progress'], statusCounts.resolved],
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            });
+
+            // Sentiment Chart
+            const sentimentCounts = {
+                'Positive': 0,
+                'Negative': 0,
+                'Neutral': 0
+            };
+
+            deptFeedback.forEach(feedback => {
+                sentimentCounts[feedback.sentiment]++;
+            });
+
+            createChart('deptSentimentChart', 'bar', {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    label: 'Feedback Count',
+                    data: [
+                        sentimentCounts.Positive,
+                        sentimentCounts.Neutral,
+                        sentimentCounts.Negative
+                    ],
+                    backgroundColor: ['#10b981', '#6b7280', '#ef4444']
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            });
+        }
+
+        // Old duplicate chart code removed — using single chart management helpers (createChart / cleanupAllCharts)
+
+        // Initialize Hotspot Map
+        function initHotspotMap() {
+            if (appState.maps.hotspotMap) {
+                appState.maps.hotspotMap.remove();
+            }
+            
+            // Define Palakkad city bounds
+            const palakkadBounds = L.latLngBounds(
+                [10.72, 76.59],  // Southwest corner
+                [10.85, 76.72]   // Northeast corner
+            );
+            
+            const map = L.map('hotspotMap', {
+                center: [10.7867, 76.6548],
+                zoom: 13,
+                minZoom: 11,
+                maxZoom: 16,
+                maxBounds: palakkadBounds,
+                maxBoundsViscosity: 1.0
+            });
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            appState.feedbackData.forEach(feedback => {
+                const color = feedback.status === 'Resolved' ? '#10b981' : 
+                             feedback.status === 'In Progress' ? '#f59e0b' : '#ef4444';
+                
+                const marker = L.circleMarker([feedback.location.lat, feedback.location.lng], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+                
+                marker.bindPopup(`<b>${feedback.category}</b><br>${feedback.description.substring(0, 50)}...`);
+            });
+            
+            appState.maps.hotspotMap = map;
+        }
+
+        // Initialize Department Hotspot Map
+        function initDeptHotspotMap() {
+            if (appState.maps.deptHotspotMap) {
+                appState.maps.deptHotspotMap.remove();
+            }
+            
+            const deptFeedback = appState.feedbackData.filter(f => f.category === appState.currentDepartment);
+            
+            // Define Palakkad city bounds
+            const palakkadBounds = L.latLngBounds(
+                [10.72, 76.59],  // Southwest corner
+                [10.85, 76.72]   // Northeast corner
+            );
+            
+            const map = L.map('deptHotspotMap', {
+                center: [10.7867, 76.6548],
+                zoom: 13,
+                minZoom: 11,
+                maxZoom: 16,
+                maxBounds: palakkadBounds,
+                maxBoundsViscosity: 1.0
+            });
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            deptFeedback.forEach(feedback => {
+                const color = feedback.status === 'Resolved' ? '#10b981' : 
+                             feedback.status === 'In Progress' ? '#f59e0b' : '#ef4444';
+                
+                const marker = L.circleMarker([feedback.location.lat, feedback.location.lng], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+                
+                marker.bindPopup(`<b>${feedback.category}</b><br>${feedback.description.substring(0, 50)}...`);
+            });
+            
+            appState.maps.deptHotspotMap = map;
+        }
+
+        // Render Feedback Table
+        function renderFeedbackTable() {
+            const tbody = document.getElementById('feedbackTableBody');
+            tbody.innerHTML = '';
+            
+            if (appState.feedbackData.length === 0) {
+                const row = tbody.insertRow();
+                row.innerHTML = '<td colspan="8" style="text-align: center; padding: var(--space-32); color: var(--color-text-secondary);">No feedback submissions yet</td>';
+                return;
+            }
+            
+            appState.feedbackData.forEach((feedback, index) => {
+                const row = tbody.insertRow();
+                let houseNumberCell = '';
+                if (feedback.userType === 'Citizen' && feedback.houseNumber) {
+                    houseNumberCell = `<br><span style='font-size:12px;color:#888;'>House: ${feedback.houseNumber}</span>`;
+                }
+                
+                // Handle photos from both snake_case and camelCase properties
+                const photos = feedback.photos || [];
+                
+                let photosCell = '';
+                if (Array.isArray(photos) && photos.length > 0) {
+                    photosCell = `
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            ${photos.map((photo, photoIndex) => `
+                                <img src='${photo}' 
+                                    style='width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #ccc;cursor:pointer;' 
+                                    onclick="showFullImage('${photo}')"
+                                    alt='View full image' 
+                                    title='Click to view full size'
+                                />`).join('')}
+                        </div>`;
+                } else {
+                    photosCell = '<span style="color: #666; font-size: 12px;">No photos</span>';
+                }
+
+                // Create a button to show full description in a modal
+                const shortDescription = feedback.description.length > 100 ? 
+                    feedback.description.substring(0, 100) + '...' : 
+                    feedback.description;
+
+                row.innerHTML = `
+                    <td>${feedback.id}</td>
+                    <td>${feedback.userType}${houseNumberCell}</td>
+                    <td>${feedback.category}</td>
+                    <td>
+                        <div style="max-height: 100px; overflow-y: auto;">
+                            ${shortDescription}
+                            ${feedback.description.length > 100 ? 
+                                `<button onclick="showFullFeedback(${feedback.id})" 
+                                    class="btn-small" style="margin-top: 8px;">
+                                    View Full Details
+                                </button>` : 
+                                ''}
+                        </div>
+                    </td>
+                    <td>${feedback.locationText}</td>
+                    <td><span class="badge ${feedback.status.toLowerCase().replace(' ', '-')}">${feedback.status}</span></td>
+                    <td><span class="badge ${feedback.sentiment.toLowerCase()}">${feedback.sentiment}</span></td>
+                    <td>${photosCell}</td>
+                `;
+            });
+        }
+
+        // Render Department Feedback Table
+        function renderDeptFeedbackTable(data) {
+            const tbody = document.getElementById('deptFeedbackTableBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                const row = tbody.insertRow();
+                row.innerHTML = '<td colspan="8" style="text-align: center; padding: var(--space-32); color: var(--color-text-secondary);">No feedback submissions yet</td>';
+                return;
+            }
+            
+            data.forEach(feedback => {
+                const row = tbody.insertRow();
+                let photosCell = '';
+                if (Array.isArray(feedback.photos) && feedback.photos.length > 0) {
+                    photosCell = `
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            ${feedback.photos.map(photo => `
+                                <img src='${photo}' 
+                                    style='width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #ccc;cursor:pointer;' 
+                                    onclick="showFullImage('${photo}')"
+                                    alt='View full image' 
+                                    title='Click to view full size'
+                                />`).join('')}
+                        </div>`;
+                } else {
+                    photosCell = '<span style="color: #666; font-size: 12px;">No photos</span>';
+                }
+                row.innerHTML = `
+                    <td>${feedback.id}</td>
+                    <td>${feedback.userType}</td>
+                    <td>${feedback.description.substring(0, 50)}...</td>
+                    <td>${feedback.locationText}</td>
+                    <td><span class="badge ${feedback.status.toLowerCase().replace(' ', '-')}">${feedback.status}</span></td>
+                    <td><span class="badge ${feedback.sentiment.toLowerCase()}">${feedback.sentiment}</span></td>
+                    <td>
+                        <select onchange="updateFeedbackStatus(${feedback.id}, this.value)" class="form-control" style="width: auto; display: inline-block; font-size: var(--font-size-sm);">
+                            <option value="pending" ${feedback.status?.toLowerCase() === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="in-progress" ${feedback.status?.toLowerCase() === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="resolved" ${feedback.status?.toLowerCase() === 'resolved' ? 'selected' : ''}>Resolved</option>
+                        </select>
+                    </td>
+                    <td>${photosCell}</td>
+                `;
+            });
+        }
+
+        // Update Feedback Status
+        function updateStatus(id, newStatus) {
+            const feedback = appState.feedbackData.find(f => f.id === id);
+            if (feedback) {
+                feedback.status = newStatus;
+                updateMainDashboard();
+            }
+        }
+
+        // Update Department Feedback Status
+        function updateDeptStatus(id, newStatus) {
+            const feedback = appState.feedbackData.find(f => f.id === id);
+            if (feedback) {
+                feedback.status = newStatus;
+                updateDeptDashboard();
+            }
+        }
+
+        // Chatbot Functions
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbotContainer');
+            const toggle = document.getElementById('chatbotToggle');
+            chatbot.classList.toggle('hidden');
+            toggle.classList.toggle('hidden');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim().toLowerCase();
+            
+            if (message) {
+                addChatMessage(input.value, 'user');
+                input.value = '';
+                
+                // Smart responses
+                setTimeout(() => {
+                    let response = 'I\'m here to help! Ask me about submitting feedback, categories, or anonymity.';
+                    
+                    if (message.includes('submit') || message.includes('how')) {
+                        response = 'To submit feedback: 1) Click "Submit Feedback" button 2) Fill in your details 3) Select category 4) Describe the issue 5) Upload photos (optional) 6) Pin location on map 7) Submit!';
+                    } else if (message.includes('categor')) {
+                        response = 'We have 8 categories: Roads & Transportation, Streetlights & Electricity, Water Supply, Waste Management, Parks & Cleanliness, Public Safety, Health & Sanitation, and Communication / Public Services.';
+                    } else if (message.includes('anonym')) {
+                        response = 'Yes! You can submit feedback anonymously by selecting "Anonymous User" in the user type dropdown.';
+                    } else if (message.includes('track') || message.includes('status')) {
+                        response = 'Admins can track and update feedback status. Citizens can check if their issues are resolved through our system.';
+                    }
+                    
+                    addChatMessage(response, 'bot');
+                }, 800);
+            }
+        }
+
+        function addChatMessage(message, sender) {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = message;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        // Switch Login Tab
+        function switchLoginTab(tabName) {
+            // Update tab buttons
+            const mainTab = document.getElementById('mainAdminTab');
+            const deptTab = document.getElementById('departmentAdminTab');
+            const mainForm = document.getElementById('mainAdminForm');
+            const deptForm = document.getElementById('departmentAdminForm');
+            
+            if (tabName === 'main-admin') {
+                mainTab.classList.add('active');
+                deptTab.classList.remove('active');
+                mainForm.classList.add('active');
+                deptForm.classList.remove('active');
+            } else {
+                deptTab.classList.add('active');
+                mainTab.classList.remove('active');
+                deptForm.classList.add('active');
+                mainForm.classList.remove('active');
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            updateFeedbackCounter();
+            
+            // Set initial chatbot visibility (home page is active by default)
+            updateChatbotVisibility('home');
+            
+            // Add greeting message to chatbot
+            setTimeout(() => {
+                const messagesContainer = document.getElementById('chatbotMessages');
+                messagesContainer.innerHTML = '<div class="message bot">Hello! I\'m here to help you with the Civic Feedback system. How can I assist you today?</div>';
+            }, 100);
+        });
+        // Function to show full description in a modal
+        function showFullDescription(description) {
+            const decodedDescription = decodeURIComponent(description);
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                max-width: 80%;
+                max-height: 80%;
+                overflow-y: auto;
+                position: relative;
+            `;
+            
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '×';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                border: none;
+                background: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #666;
+            `;
+            
+            content.innerHTML = `<div style="padding-right: 30px;">${decodedDescription}</div>`;
+            content.appendChild(closeButton);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            const closeModal = () => document.body.removeChild(modal);
+            closeButton.onclick = closeModal;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+        }
+
+        // Style for tables
+        const style = document.createElement('style');
+        style.textContent = `
+            .feedback-table td {
+                vertical-align: top;
+                padding: 12px;
+            }
+            .feedback-photo {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+            .feedback-photo:hover {
+                transform: scale(1.05);
+            }
+            .feedback-description {
+                max-height: 100px;
+                overflow-y: auto;
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Function to show full image in a modal
+        function showFullImage(imageUrl) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const image = document.createElement('img');
+            image.src = imageUrl;
+            image.style.cssText = `
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                border-radius: 8px;
+            `;
+            
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '×';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                border: none;
+                background: none;
+                font-size: 32px;
+                cursor: pointer;
+                color: white;
+            `;
+            
+            modal.appendChild(image);
+            modal.appendChild(closeButton);
+            document.body.appendChild(modal);
+            
+            const closeModal = () => document.body.removeChild(modal);
+            closeButton.onclick = closeModal;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+        }
+        // Function to show full feedback details
+        function showFullFeedback(feedbackId) {
+            const feedback = appState.feedbackData.find(f => f.id === feedbackId);
+            if (!feedback) return;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                max-width: 90%;
+                max-height: 90%;
+                overflow-y: auto;
+                position: relative;
+            `;
+            
+            let photoGallery = '';
+            if (Array.isArray(feedback.photos) && feedback.photos.length > 0) {
+                photoGallery = `
+                    <div style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 10px;">Photos:</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${feedback.photos.map(photo => `
+                                <img src="${photo}" 
+                                    style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px; cursor: pointer;"
+                                    onclick="showFullImage('${photo}')"
+                                    alt="Feedback photo"
+                                />
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <button style="position: absolute; top: 10px; right: 10px; border: none; background: none; 
+                    font-size: 24px; cursor: pointer; color: #666;" onclick="this.parentElement.parentElement.remove()">×</button>
+                <h2 style="margin-bottom: 20px;">Feedback Details</h2>
+                <div style="display: grid; gap: 15px;">
+                    <div>
+                        <strong>ID:</strong> ${feedback.id}
+                    </div>
+                    <div>
+                        <strong>User Type:</strong> ${feedback.userType}
+                        ${feedback.userType === 'Citizen' && feedback.houseNumber ? 
+                            `<br><span style="color: #666;">House Number: ${feedback.houseNumber}</span>` : ''}
+                    </div>
+                    <div>
+                        <strong>Category:</strong> ${feedback.category}
+                    </div>
+                    <div>
+                        <strong>Description:</strong>
+                        <div style="margin-top: 5px; white-space: pre-wrap;">${feedback.description}</div>
+                    </div>
+                    <div>
+                        <strong>Location:</strong> ${feedback.locationText}
+                    </div>
+                    <div>
+                        <strong>Status:</strong> 
+                        <span class="badge ${feedback.status.toLowerCase().replace(' ', '-')}">${feedback.status}</span>
+                    </div>
+                    <div>
+                        <strong>Sentiment:</strong> 
+                        <span class="badge ${feedback.sentiment.toLowerCase()}">${feedback.sentiment}</span>
+                    </div>
+                </div>
+                ${photoGallery}
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+        }
+    </script>
+
+</body>
+</html>

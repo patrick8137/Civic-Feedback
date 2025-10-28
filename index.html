@@ -1857,7 +1857,7 @@
                     formData.photos = appState.uploadedPhotos;
                 }
                 
-                const response = await fetch('http://localhost:8000/api/submit/', {
+                const response = await fetch('https://civic-feedback.onrender.com/api/submit/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1914,7 +1914,7 @@
         async function fetchFeedbackData() {
             try {
                 console.log('Fetching feedback data...');
-                const response = await fetch('http://localhost:8000/api/list/', {
+                const response = await fetch('https://civic-feedback.onrender.com/api/list/', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -2014,7 +2014,7 @@
         // Fetch Statistics
         async function fetchStats() {
             try {
-                const response = await fetch('http://localhost:8000/api/stats/', {
+                const response = await fetch('https://civic-feedback.onrender.com/api/stats/', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -2069,7 +2069,7 @@
         async function updateFeedbackStatus(feedbackId, newStatus) {
             try {
                 console.log(`Updating feedback ${feedbackId} status to ${newStatus}`);
-                const response = await fetch(`http://localhost:8000/api/update-status/${feedbackId}/`, {
+                const response = await fetch(`https://civic-feedback.onrender.com/api/update-status/${feedbackId}/`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
